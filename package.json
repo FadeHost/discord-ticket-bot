@@ -1,0 +1,17 @@
+{
+  "name": "fadehost-ticket-bot",
+  "version": "1.0.0",
+  "description": "Support tickets for Discord: a button opens a private channel, a transcript lands in your log channel when it closes. Hosted by FadeHost.",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.3"
+  },
+  "license": "MIT"
+}
