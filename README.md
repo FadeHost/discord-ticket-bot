@@ -1,5 +1,7 @@
 # FadeHost Ticket Bot
 
+[![Deploy to FadeHost](https://fadehost.com/deploy-button.svg)](https://laplace.fadehost.com/register?intent=bot&repo=https://github.com/FadeHost/discord-ticket-bot)
+
 Support tickets for your Discord server: a button opens a private channel for the member, your support role sees it, and a transcript lands in a log channel when it closes.
 
 ## Setup on FadeHost
