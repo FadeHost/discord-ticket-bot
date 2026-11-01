@@ -1,5 +1,5 @@
-import { Client, GatewayIntentBits, Events, REST, Routes } from 'discord.js';
-import { commands, handleCommand, handleButton } from './src/commands.js';
+import { ApplicationFlagsBitField, Client, GatewayIntentBits, Events, REST, Routes } from 'discord.js';
+import { commands, handleCommand, handleButton, setCanReadMessages } from './src/commands.js';
 
 const token = (process.env.DISCORD_TOKEN || '').trim();
 if (!token) {
@@ -12,6 +12,15 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBit
 client.once(Events.ClientReady, async (c) => {
   console.log(`[ticket-bot] online as ${c.user.tag} in ${c.guilds.cache.size} server(s)`);
   c.user.setActivity('for tickets', { type: 3 });
+  // Transcripts are only whole when the app may read what members write.
+  const flags = c.application.flags ?? (await c.application.fetch().catch(() => null))?.flags;
+  if (flags) {
+    const canRead = flags.has(ApplicationFlagsBitField.Flags.GatewayMessageContent) || flags.has(ApplicationFlagsBitField.Flags.GatewayMessageContentLimited);
+    setCanReadMessages(canRead);
+    if (!canRead) {
+      console.warn('[ticket-bot] The Message Content intent is off, so transcripts will leave out what members wrote. Turn it on at discord.com/developers, your app, Bot, Privileged Gateway Intents, then restart the bot.');
+    }
+  }
   try {
     await new REST().setToken(token).put(Routes.applicationCommands(c.user.id), { body: commands });
     console.log('[ticket-bot] slash commands registered');

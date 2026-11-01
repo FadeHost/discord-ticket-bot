@@ -6,9 +6,10 @@ Support tickets for your Discord server: a button opens a private channel for th
 
 ## Setup on FadeHost
 1. Create a bot at https://discord.com/developers/applications: New Application, Bot, Reset Token.
-2. Invite it with the `bot` and `applications.commands` scopes and the **Manage Channels**, **Manage Roles** (to set channel permissions), **Send Messages**, **Read Message History** and **Attach Files** permissions.
-3. In your FadeHost panel, deploy the **Ticket Bot** template and paste the token as `DISCORD_TOKEN`.
-4. In Discord, run `/ticket-setup` with the category tickets open in, the support role and the log channel, then `/ticket-panel` in the channel where members should press the button.
+2. Under Bot, Privileged Gateway Intents, turn on **Message Content Intent**. Without it Discord leaves the text and attachments out of members' messages, so their lines in the transcript come out blank. The bot says so in its console when it starts.
+3. Invite it with the `bot` and `applications.commands` scopes and the **Manage Channels**, **Manage Roles** (to set channel permissions), **Send Messages**, **Read Message History** and **Attach Files** permissions.
+4. In your FadeHost panel, deploy the **Ticket Bot** template and paste the token as `DISCORD_TOKEN`.
+5. In Discord, run `/ticket-setup` with the category tickets open in, the support role and the log channel, then `/ticket-panel` in the channel where members should press the button.
 
 ## Commands
 | Command | What it does |

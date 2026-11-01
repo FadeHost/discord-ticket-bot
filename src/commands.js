@@ -12,6 +12,18 @@ import { getGuild, save } from './store.js';
 
 const ADMIN = PermissionFlagsBits.ManageGuild;
 
+// Whether the bot may read what members write. Discord leaves the text,
+// attachments and embeds out of other people's messages, even in a fetched
+// channel history, for an app without the Message Content intent turned on
+// in the Developer Portal. The bot itself only fetches history, so it never
+// asks for the intent when it connects; index.js reads the app's flags.
+let canReadMessages = true;
+export function setCanReadMessages(value) {
+  canReadMessages = value;
+}
+const NO_CONTENT_NOTE =
+  'The bot does not have the Message Content intent, so Discord left out what members wrote. Turn it on at discord.com/developers, your app, Bot, Privileged Gateway Intents.';
+
 export const commands = [
   new SlashCommandBuilder()
     .setName('ticket-setup')
@@ -141,6 +153,7 @@ async function closeTicket(channel, closedBy, settings) {
   const lines = messages
     ? [...messages.values()].reverse().map((m) => `[${m.createdAt.toISOString()}] ${m.author.tag}: ${m.content || ''}${m.attachments.size ? ` (${[...m.attachments.values()].map((a) => a.url).join(' ')})` : ''}`)
     : ['(transcript unavailable)'];
+  const note = canReadMessages ? '' : `${NO_CONTENT_NOTE}\n\n`;
   const owner = Object.entries(settings.open).find(([, id]) => id === channel.id)?.[0];
   if (owner) delete settings.open[owner];
   await save();
@@ -148,13 +161,13 @@ async function closeTicket(channel, closedBy, settings) {
   if (settings.logChannelId) {
     const log = channel.guild.channels.cache.get(settings.logChannelId);
     if (log) {
-      const file = new AttachmentBuilder(Buffer.from(lines.join('\n'), 'utf8'), { name: `${channel.name}.txt` });
+      const file = new AttachmentBuilder(Buffer.from(note + lines.join('\n'), 'utf8'), { name: `${channel.name}.txt` });
       await log
         .send({
           embeds: [
             new EmbedBuilder()
               .setTitle(`${channel.name} closed`)
-              .setDescription(`Opened by ${owner ? `<@${owner}>` : 'unknown'}, closed by <@${closedBy.id}>. ${lines.length} message(s).`)
+              .setDescription(`Opened by ${owner ? `<@${owner}>` : 'unknown'}, closed by <@${closedBy.id}>. ${lines.length} message(s).${canReadMessages ? '' : `\n\n${NO_CONTENT_NOTE}`}`)
               .setColor(0xed4245)
               .setTimestamp(),
           ],
